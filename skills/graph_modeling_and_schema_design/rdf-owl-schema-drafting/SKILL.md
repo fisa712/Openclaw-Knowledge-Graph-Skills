@@ -12,284 +12,134 @@ tags:
   - schema-design
   - linked-data
   - developer-tools
-version: 0.1.0
+version: 1.0.0
 author: community
 license: MIT
 ---
 
 # RDF / OWL Schema Drafting
 
-## Purpose
+**Design RDF and OWL ontologies for semantic web and knowledge graph systems.**
 
-This skill assists developers in **designing RDF and OWL ontologies for knowledge graph systems**.
+This skill translates domain models, entity descriptions, and requirements into machine-readable RDF/OWL schemas with classes, properties, and constraints.
 
-It translates domain models, documentation, or structured requirements into:
+## Quick Start
 
-- RDF classes
-- OWL classes
-- Object properties
-- Datatype properties
-- Ontology relationships
-- Namespace structures
-- Basic reasoning constraints
+### Use When
+- Designing new RDF/OWL ontologies
+- Converting domain models → semantic schemas
+- Building linked data systems
+- Creating triple store ontologies
+- Designing semantic knowledge graphs
 
-The output is suitable for use in **semantic web environments and triple stores**.
-
----
-
-# When To Use This Skill
-
-Use this skill when:
-
-- Designing a **new RDF or OWL ontology**
-- Converting **domain models into semantic schemas**
-- Building schemas for **linked data systems**
-- Preparing ontologies for **triple stores**
-- Creating **semantic knowledge graphs**
-
-Example prompts:
-
-- "Draft an OWL ontology for a healthcare knowledge graph."
-- "Create RDF classes and properties for this domain."
-- "Generate an ontology schema for a supply chain system."
-- "Convert this entity model to OWL."
-
----
-
-# Inputs
-
-The skill expects one or more of the following:
-
+### Inputs
 - Domain descriptions
-- Entity models
-- ER diagrams
-- JSON schemas
-- CSV data structure descriptions
+- Entity models or ER diagrams
+- JSON/CSV structures
 - Knowledge graph requirements
-- Existing relational schemas
-
-Example input:
-
-A research system contains researchers, papers, institutions, and conferences.
-
-Researchers write papers.
-
-Papers are published in conferences.
-
-Researchers are affiliated with institutions.
-
-
----
-
-# Expected Output
-
-The skill should produce a **semantic ontology structure** including:
-
-### Classes
-
-Example:
-
-:Researcher
-
-:Paper
-
-:Institution
-
-:Conference
-
-
-### Object Properties
-
-:writes
-
-:publishedIn
-
-:affiliatedWith
-
-### Datatype Properties
-
-:name
-
-:email
-
-:title
-
-:publicationYear
-
-### Example RDF Triples
-
-:Researcher rdf:type owl:Class
-
-:Paper rdf:type owl:Class
-
-
-:writes rdf:type owl:ObjectProperty
-
-:writes rdfs:domain :Researcher
-
-:writes rdfs:range :Paper
-
-
----
-
-# Ontology Design Guidelines
-
-When drafting RDF/OWL schemas:
-
-1. Define **clear namespaces**
-2. Separate **classes vs instances**
-3. Use **object properties for relationships**
-4. Use **datatype properties for attributes**
-5. Define **domain and range constraints**
-6. Keep naming consistent
-
-Naming style recommendation:
-
-Class: PascalCase
-
-Property: camelCase
-
-
-Example:
-
-Researcher
-
-hasAffiliation
-
-publicationYear
-
-
----
-
-# Recommended Namespaces
-
-Example namespace structure:
-
-@prefix ex: http://example.org/ontology#
- .
-
-@prefix rdf: http://www.w3.org/1999/02/22-rdf-syntax-ns#
- .
-
-@prefix rdfs: http://www.w3.org/2000/01/rdf-schema#
- .
-
-@prefix owl: http://www.w3.org/2002/07/owl#
- .
-
----
-
-# Developer Implementation Notes
-
-When generating or manipulating RDF/OWL schemas programmatically, prefer **Python-based semantic web libraries**.
-
-Recommended libraries:
-
-### Core RDF/OWL Libraries
-
-- rdflib
-- owlready2
-
-### Graph Utilities
-
-- networkx
-- pyvis
-
-### Schema Validation
-
-- pyshacl
-
-### Ontology Visualization
-
-- graphviz
-- pyvis
-
----
-
-# Example Python RDF Schema Draft
-
-```python
-from rdflib import Graph, Namespace, RDF, RDFS, OWL
-
-g = Graph()
-
-EX = Namespace("http://example.org/ontology#")
-
-g.bind("ex", EX)
-g.bind("owl", OWL)
-g.bind("rdfs", RDFS)
-
-# Define classes
-g.add((EX.Researcher, RDF.type, OWL.Class))
-g.add((EX.Paper, RDF.type, OWL.Class))
-
-# Define object property
-g.add((EX.writes, RDF.type, OWL.ObjectProperty))
-g.add((EX.writes, RDFS.domain, EX.Researcher))
-g.add((EX.writes, RDFS.range, EX.Paper))
-
-print(g.serialize(format="turtle").decode())
+- Relational schemas
+
+### Outputs
+- RDF classes (rdfs:Class)
+- OWL classes (owl:Class)
+- Object properties (owl:ObjectProperty)
+- Datatype properties (rdf:Property)
+- Domain/range constraints
+- Turtle/RDF serialization
+
+## Example
+
+**Input:**
 ```
-# Example OWL Ontology Draft Using Owlready2
-```python
-from owlready2 import *
-
-onto = get_ontology("http://example.org/ontology.owl")
-
-with onto:
-
-    class Researcher(Thing):
-        pass
-
-    class Paper(Thing):
-        pass
-
-    class writes(ObjectProperty):
-        domain = [Researcher]
-        range = [Paper]
-
-onto.save(file="ontology.owl")
+A research system contains researchers, papers, and institutions.
+Researchers write papers and are affiliated with institutions.
+Papers have titles and publication years.
 ```
 
-### Skill Behavior
+**Output:**
+```turtle
+@prefix ex: <http://example.org/ontology#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 
-When executing this skill:
-1. Identify ontology classes
-2. Identify relationships between classes
-3. Determine datatype attributes
-4. Define OWL object properties
-5. Define domain and range
-6. Generate RDF/OWL representation
-7. Provide example triples
+ex:Researcher a owl:Class ;
+  rdfs:label "Researcher" .
 
-Outputs should be usable in:
+ex:Paper a owl:Class ;
+  rdfs:label "Paper" .
 
-* RDF triple stores
+ex:writes a owl:ObjectProperty ;
+  rdfs:domain ex:Researcher ;
+  rdfs:range ex:Paper ;
+  rdfs:label "writes" .
 
-* SPARQL engines
+ex:name a rdf:Property ;
+  rdfs:label "name" .
+```
 
-* Semantic graph platforms
+## Execution Steps
 
-### Best Practices
+1. **Identify Classes** – Extract core concepts/entities
+2. **Identify Properties** – Extract relationships and attributes
+3. **Define Domain/Range** – Specify property constraints
+4. **Map to OWL** – Convert to OWL/RDF structures
+5. **Generate Ontology** – Output Turtle or RDF/XML
 
-Follow semantic web modeling principles:
+## Schema Components
 
-* reuse existing vocabularies where possible
+### Classes (Concepts)
+```
+owl:Class - Core entities
+Example: Researcher, Paper, Institution
+Naming: PascalCase
+```
 
-* keep ontologies modular
+### Object Properties (Relationships)
+```
+owl:ObjectProperty - Connect classes
+Example: writes, affiliatedWith, publishedIn
+Domain: Source class
+Range: Target class
+Naming: camelCase
+```
 
-* avoid over-modeling early
+### Datatype Properties (Attributes)
+```
+rdf:Property - String/numeric values
+Example: name, email, publicationYear
+Naming: camelCase
+```
 
-* maintain namespace consistency
+## Namespace Structure
 
-* document ontology classes and properties
+```turtle
+@prefix ex: <http://example.org/ontology#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+```
 
-Useful vocabularies to reuse when applicable:
+## Recommended Libraries
 
-* FOAF
+- **Core:** rdflib, owlready2
+- **Utilities:** networkx, pyvis
+- **Validation:** pyshacl
+- **Visualization:** graphviz
 
-* Dublin Core
+## Best Practices
 
-* Schema.org
+✓ Use clear namespace URIs  
+✓ Separate classes from instances  
+✓ Define domain/range constraints  
+✓ Use camelCase for properties, PascalCase for classes  
+✓ Reuse existing vocabularies (FOAF, Dublin Core, Schema.org)  
+✓ Keep ontologies modular and maintainable  
+✓ Document classes and properties with rdfs:label  
 
-* SKOS
+## References
+
+See [ontology-patterns.md](references/ontology-patterns.md) for OWL design patterns and [example-ontologies.md](examples/example-ontologies.md) for domain ontology examples.
+
+---
+
+**Status:** Production Ready | **Version:** 1.0.0

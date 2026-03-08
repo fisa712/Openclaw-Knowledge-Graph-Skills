@@ -1,322 +1,144 @@
 ---
-
 name: property_graph_schema_designer
 title: Property Graph Schema Designer (Neo4j Style)
 description: Design property graph schemas for knowledge graph systems using Neo4j-style node labels, relationships, and properties based on domain descriptions or developer requirements.
 category: graph-modeling
 tags:
-
-* knowledge-graph
-* property-graph
-* neo4j
-* graph-schema
-* graph-modeling
-* cypher
-* developer-tools
-  version: 0.1.0
-  author: community
-  license: MIT
-
+  - knowledge-graph
+  - property-graph
+  - neo4j
+  - graph-schema
+  - graph-modeling
+  - cypher
+  - developer-tools
+version: 1.0.0
+author: community
+license: MIT
 ---
 
-# Property Graph Schema Designer (Neo4j Style)
+# Property Graph Schema Designer
 
-## Purpose
+**Design Neo4j-style property graph schemas from domain descriptions.**
 
-This skill assists developers in **designing property graph schemas** used in systems such as Neo4j and other property graph databases.
+This skill translates domain models, requirements, and entity descriptions into structured property graph schemas with node labels, relationships, properties, and constraints.
 
-It translates domain descriptions or system requirements into a structured schema containing:
+## Quick Start
 
-* Node labels
-* Relationship types
-* Node properties
-* Relationship properties
-* Graph constraints
-* Index recommendations
+### Use When
+- Designing property graph schemas for Neo4j
+- Converting domain documentation → graph models
+- Creating graph database data models
+- Modeling entities and relationships
+- Bootstrapping graph projects
 
-The result is a **developer-friendly graph schema blueprint** that can be implemented in Neo4j or similar databases.
+### Inputs
+- Domain descriptions
+- System architecture docs
+- Entity relationship diagrams
+- Relational schemas
+- JSON/API schemas
+- Business rules
 
----
+### Outputs
+- Node labels (e.g., Student, Course)
+- Relationship types (e.g., ENROLLED_IN, TEACHES)
+- Node properties with types
+- Relationship properties
+- Index recommendations
+- Constraint suggestions
+- Cypher implementation templates
 
-# When To Use This Skill
+## Example
 
-Use this skill when:
-
-* Designing a **property graph data model**
-* Creating schemas for **Neo4j-based knowledge graphs**
-* Converting **domain documentation into graph structures**
-* Modeling **entities and relationships for graph databases**
-* Bootstrapping **graph database projects**
-
-Example prompts:
-
-* "Design a Neo4j schema for a university system."
-* "Create a property graph model for an e-commerce platform."
-* "Generate a graph schema for a social network."
-* "Model relationships for a supply chain graph."
-
----
-
-# Inputs
-
-The skill accepts inputs such as:
-
-* Domain descriptions
-* System architecture documentation
-* Entity relationship diagrams
-* Relational schemas
-* JSON or API schemas
-* Business rules
-* Graph use cases
-
-Example input:
-
+**Input:**
 ```
-A university system contains students, professors, courses, and departments.
-
-Students enroll in courses.
-Professors teach courses.
+A university has students, professors, courses, and departments.
+Students enroll in courses. Professors teach courses.
 Departments manage professors and courses.
 ```
 
----
-
-# Expected Output
-
-The skill produces a **property graph schema specification**.
-
-## Node Labels
-
+**Output:**
 ```
-Student
-Professor
-Course
-Department
-```
+Node Labels:
+- Student (properties: student_id, name, email, enrollment_year)
+- Professor (properties: professor_id, name, research_area)
+- Course (properties: course_id, title, credits)
+- Department (properties: dept_id, name, budget)
 
-## Relationships
+Relationships:
+- (Student)-[:ENROLLED_IN {semester}]->(Course)
+- (Professor)-[:TEACHES {semester}]->(Course)
+- (Department)-[:MANAGES]->(Course)
+- (Department)-[:EMPLOYS]->(Professor)
 
-```
-(Student)-[:ENROLLED_IN]->(Course)
-
-(Professor)-[:TEACHES]->(Course)
-
-(Department)-[:MANAGES]->(Course)
-
-(Department)-[:EMPLOYS]->(Professor)
+Constraints:
+- CREATE CONSTRAINT student_id UNIQUE on Student.student_id
+- CREATE CONSTRAINT course_id UNIQUE on Course.course_id
+- CREATE INDEX on Professor.name
 ```
 
-## Node Properties
+## Execution Steps
 
-Student:
+1. **Identify Entities** – Extract nouns/concepts from domain text
+2. **Map to Node Labels** – Determine PascalCase labels
+3. **Identify Relationships** – Extract verbs and connections
+4. **Map Relationship Types** – Determine SCREAMING_SNAKE_CASE types
+5. **Extract Properties** – Identify node & relationship attributes
+6. **Suggest Constraints** – Recommend unique constraints
+7. **Suggest Indexes** – Recommend indexes for queries
+8. **Generate Cypher** – Output implementation templates
 
-* student_id
-* name
-* email
-* enrollment_year
+## Schema Components
 
-Course:
-
-* course_id
-* title
-* credits
-
-Professor:
-
-* professor_id
-* name
-* research_area
-
-Department:
-
-* department_id
-* name
-
-
-
-## Relationship Properties (optional)
-
+### Node Labels
+```
+PascalCase naming
+Examples: Student, Professor, Course, Department
 ```
 
-ENROLLED_IN
-
-* semester
-* grade
-
-TEACHES
-
-* semester
-
+### Relationship Types
+```
+SCREAMING_SNAKE_CASE naming
+Directional: A-[TYPE]->B
+Examples: ENROLLED_IN, TEACHES, MANAGES
 ```
 
----
-
-# Example Cypher Schema Draft
-
-Example Cypher statements for implementing the schema:
-
+### Properties
+```
+Node properties: camelCase (student_id, name, email)
+Relationship properties: camelCase (semester, grade)
+Include types: String, Integer, Date, Float
 ```
 
-CREATE CONSTRAINT student_id IF NOT EXISTS
-FOR (s:Student)
-REQUIRE s.student_id IS UNIQUE;
-
-CREATE CONSTRAINT course_id IF NOT EXISTS
-FOR (c:Course)
-REQUIRE c.course_id IS UNIQUE;
-
-CREATE INDEX professor_name IF NOT EXISTS
-FOR (p:Professor)
-ON (p.name);
-
+### Constraints & Indexes
+```
+Unique constraints on identifiers
+Indexes on frequently queried properties
+Recommended indexes for relationships
 ```
 
-Example relationship creation:
+## Recommended Libraries
 
-```
+- **Drivers:** neo4j, py2neo
+- **Graph modeling:** networkx
+- **Visualization:** pyvis, graphviz
+- **Data:** pandas
 
-MATCH (s:Student {student_id: "S001"})
-MATCH (c:Course {course_id: "CS101"})
-CREATE (s)-[:ENROLLED_IN {semester:"Fall"}]->(c);
+## Best Practices
 
-```
+✓ Use clear, consistent naming (PascalCase, SCREAMING_SNAKE_CASE, camelCase)  
+✓ Avoid redundant relationships  
+✓ Prefer directional relationships  
+✓ Use unique constraints on identifiers  
+✓ Index frequently queried properties  
+✓ Keep nodes focused, avoid over-nesting  
+✓ Separate schema concerns from instance data  
+✓ Plan for query patterns upfront  
+
+## References
+
+See [schema-patterns.md](references/schema-patterns.md) for property graph design patterns and [example-schemas.md](examples/example-schemas.md) for domain schema examples.
 
 ---
 
-# Developer Implementation Notes
-
-When implementing schema generation or graph manipulation programmatically, prefer **Python libraries commonly used with property graph databases**.
-
-Recommended libraries:
-
-### Graph Database Drivers
-
-- neo4j
-- py2neo
-
-### Graph Modeling
-
-- networkx
-
-### Visualization
-
-- pyvis
-- graphviz
-
-### Data Processing
-
-- pandas
-
----
-
-# Example Python Graph Model (NetworkX)
-
-```
-
-import networkx as nx
-
-G = nx.MultiDiGraph()
-
-G.add_node("Student", type="label")
-G.add_node("Course", type="label")
-
-G.add_edge("Student", "Course", relationship="ENROLLED_IN")
-
-print(G.nodes())
-print(G.edges(data=True))
-
-```
-
----
-
-# Example Neo4j Connection (Python)
-
-```
-
-from neo4j import GraphDatabase
-
-driver = GraphDatabase.driver("bolt://localhost:7687", auth=("neo4j","password"))
-
-def create_student(tx, student_id, name):
-tx.run(
-"CREATE (s:Student {student_id:$id, name:$name})",
-id=student_id,
-name=name
-)
-
-with driver.session() as session:
-session.write_transaction(create_student, "S001", "Alice")
-
-```
-
----
-
-# Skill Behavior
-
-When executing this skill:
-
-1. Identify **node entities**
-2. Define **node labels**
-3. Identify **relationships**
-4. Define **relationship types**
-5. Determine **node properties**
-6. Determine **relationship properties**
-7. Suggest **indexes and constraints**
-8. Produce **Cypher schema templates**
-
-Outputs should be compatible with:
-
-- Neo4j
-- Memgraph
-- Amazon Neptune (property graph mode)
-- TigerGraph-style modeling concepts
-
----
-
-# Graph Modeling Guidelines
-
-Recommended best practices:
-
-- Use **clear node labels**
-- Use **UPPERCASE relationship types**
-- Avoid overly complex node structures
-- Prefer **directional relationships**
-- Use **indexes for frequently queried properties**
-- Normalize entities rather than duplicating data
-
-Example naming conventions:
-
-```
-
-Node labels: PascalCase
-Relationships: UPPERCASE
-Properties: camelCase
-
-```
-
----
-
-# Limitations
-
-This skill generates **schema drafts**, not production-ready implementations.
-
-Developers should still:
-
-- validate with domain experts
-- refine constraints
-- benchmark query patterns
-- optimize indexes
-
----
-
-# Future Extensions
-
-Potential improvements:
-
-- automatic Cypher migration scripts
-- query optimization hints
-- graph refactoring suggestions
-- schema evolution tools
-- Neo4j APOC integration
----
-```
+**Status:** Production Ready | **Version:** 1.0.0
