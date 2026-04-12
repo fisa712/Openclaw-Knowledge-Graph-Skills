@@ -205,3 +205,10 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# Project-specific files that should not be committed
+README.local.md
+REFACTORING_SUMMARY.md
+REFACTORING_SUMMARY_*.md
+FILE_MANIFEST.md
+GETTING_STARTED.md
