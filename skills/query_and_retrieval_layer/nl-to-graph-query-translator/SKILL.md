@@ -3,223 +3,139 @@ name: nl-to-graph-query-translator
 description: Translate natural language questions into Cypher or SPARQL queries for graph databases and knowledge graphs.
 metadata:
   {"openclaw":{"emoji":"🔍","homepage":"https://clawhub.com"}}
+status: production
+version: 1.0.0
+tags: ["graph-queries", "nlp", "cypher", "sparql", "query-generation"]
 ---
 
 # Natural Language → Cypher / SPARQL Translator
 
-Convert natural language questions into executable graph queries.
+**Convert natural language questions into executable graph queries.**
 
-This skill translates human-readable requests into graph query languages such as Cypher or SPARQL, allowing developers to interact with graph databases using natural language instead of writing complex query syntax.
+This skill translates human-readable requests into graph query languages such as **Cypher** (Neo4j) or **SPARQL** (RDF), allowing developers to interact with graph databases using natural language instead of writing complex query syntax.
 
-It improves developer productivity by simplifying graph query construction and enabling quick data exploration.
+## Quick Start
 
----
-
-# When To Use This Skill
+### Use Cases
 
 Use this skill when a user wants to:
 
-- Convert natural language questions into graph queries
-- Generate Cypher queries for property graph databases
-- Generate SPARQL queries for RDF triple stores
-- Explore graph datasets using plain English
-- Quickly prototype graph queries
+- ✅ Convert natural language questions into graph queries
+- ✅ Generate Cypher queries for property graph databases
+- ✅ Generate SPARQL queries for RDF triple stores
+- ✅ Explore graph datasets using plain English
+- ✅ Quickly prototype graph queries
 
-Example requests:
+**Example requests:**
+- "Find employees who work at Acme."
+- "Show all companies located in California."
+- "List people connected to Alice within two hops."
+- "Find products purchased by customers in London."
 
-- “Find employees who work at Acme.”
-- “Show all companies located in California.”
-- “List people connected to Alice within two hops.”
-- “Find products purchased by customers in London.”
+### What This Skill Produces
 
----
+The skill generates executable graph queries in supported query languages:
 
-# What This Skill Produces
+- 🔗 Cypher queries (Neo4j)
+- 🔗 SPARQL queries (RDF triple stores)
+- 📝 Query explanations
+- 🎯 Query parameter templates
 
-The skill generates executable graph queries in supported query languages.
+## Translation Process
 
-Possible outputs:
+The translator follows a 5-step process to convert natural language into executable queries:
 
-- Cypher queries
-- SPARQL queries
-- query explanations
-- query parameter templates
+1. **Identify Entities** — Detect entity names (people, organizations, locations)
+2. **Identify Relationships** — Extract relationship verbs (works at, located in, purchased, etc.)
+3. **Determine Query Type** — Classify request type (nodes, relationships, paths, counts, aggregations)
+4. **Construct Query Pattern** — Build graph patterns representing relationships
+5. **Generate Query Syntax** — Convert patterns into Cypher or SPARQL
 
----
+For detailed information about each step, see [Query Translation Strategy](references/query-patterns.md#translation-strategy).
 
-# Example Translation
-
-Natural language:
-
-Find employees who work at Acme.
-
-Cypher query:
-
-```text
-MATCH (p:Person)-[:WORKS_AT]->(c:Company {name:"Acme"})
-RETURN p
-```
-
----
-
-Natural language:
-
-List companies located in California.
-
-
-SPARQL query:
-
-```text
-SELECT ?company
-WHERE {
-?company rdf:type :Company .
-?company :locatedIn :California .
-}
-```
-
----
-
-# Multi-Hop Query Example
-
-Natural language:
-
-Find people connected to Alice within two relationships.
-
-Cypher query:
-
-```text
-MATCH (a:Person {name:"Alice"})-[*1..2]-(connected)
-RETURN connected
-```
-
----
-
-# Query Translation Strategy
-
-When translating natural language into graph queries:
-
-1. **Identify Entities**
-
-   Detect entity names such as people, organizations, or locations.
-
-2. **Identify Relationships**
-
-   Extract relationship verbs such as:
-
-   - works at
-   - located in
-   - purchased
-   - founded
-
-3. **Determine Query Type**
-
-   Determine whether the request is asking for:
-
-   - nodes
-   - relationships
-   - counts
-   - paths
-   - aggregations
-
-4. **Construct Query Pattern**
-
-   Build graph patterns representing entity relationships.
-
-5. **Generate Query Syntax**
-
-   Convert the graph pattern into the appropriate query language.
-
----
-
-# Supported Query Languages
+## Supported Query Languages
 
 ### Cypher
+Used in **Neo4j** and other property graph databases.
 
-Used in property graph databases.
-
-Example:
-```text
+**Example:**
+```cypher
 MATCH (p:Person)-[:PURCHASED]->(product:Product)
 RETURN p, product
 ```
 
----
+📖 See [Cypher Query Guide](references/cypher-query-guide.md)
 
 ### SPARQL
+Used in **RDF triple stores** and knowledge graphs.
 
-Used in RDF knowledge graphs.
-
-Example:
-```text
+**Example:**
+```sparql
 SELECT ?person ?product
 WHERE {
-?person :purchased ?product .
+  ?person :purchased ?product .
 }
 ```
 
----
+📖 See [SPARQL Query Guide](references/sparql-query-guide.md)
 
-# Output Formats
+## Common Patterns
 
-The skill may generate several outputs:
-
-### Graph Query
-
-Executable Cypher or SPARQL query.
-
-### Query Explanation
-
-Human-readable explanation of what the query does.
-
-Example:
-
-This query finds all people connected to Alice through the WORKS_AT relationship.
-
-
-### Query Template
-
-Parameterized queries.
-
-Example:
-```text
-MATCH (p:Person)-[:WORKS_AT]->(c:Company {name:$company})
-RETURN p
+### Simple Entity Lookup
+```
+"Find all people named Alice"
 ```
 
+### Relationship Traversal
+```
+"Show companies where employees work"
+```
+
+### Multi-Hop Queries
+```
+"Find people connected to Alice within two relationships"
+```
+
+For more patterns, see [Query Patterns Reference](references/query-patterns.md).
+
+## Examples
+
+Browse practical examples organized by complexity and use case:
+
+- 🚀 [Basic Translations](examples/basic-translations.md)
+- 🔀 [Multi-Hop Queries](examples/multi-hop-queries.md)
+- 🎯 [Parameterized Queries](examples/parameterized-queries.md)
+- 📊 [Domain-Specific Examples](examples/domain-specific-examples.md)
+
+## Best Practices
+
+When generating and executing graph queries:
+
+✓ Use schema labels consistently  
+✓ Avoid overly broad relationship patterns  
+✓ Prefer parameterized queries for security  
+✓ Include LIMIT clauses for large datasets  
+✓ Validate query syntax before execution  
+
+See [Architecture & Implementation](architecture.md) for advanced considerations.
+
+## Advanced Topics
+
+- 🏗️ [System Architecture & Design](architecture.md)
+- 🔧 [Entity Recognition Pipeline](references/entity-recognition.md)
+- 🔗 [Relationship Extraction](references/relationship-extraction.md)
+- 📚 [API Reference](references/api-reference.md)
+- ⚠️ [Known Limitations & Edge Cases](tests/edge-cases.md)
+
+## Related Skills
+
+- [Graph Query Debugging Tool](../graph-query-debugging-tool/SKILL.md)
+- [Graph Query Optimization Assistant](../graph-query-optimization-assistant/SKILL.md)
+- [Graph Template Query Generator](../graph-template-query-generator/SKILL.md)
+- [Multi-Hop Reasoning Query Builder](../multi-hop-reasoning-query-builder/SKILL.md)
+
 ---
 
-# Implementation Notes
-
-The translator may internally perform:
-
-- entity recognition
-- intent detection
-- graph schema awareness
-- query pattern generation
-
-It may also integrate with schema metadata to produce more accurate queries.
-
----
-
-# Best Practices
-
-When generating graph queries:
-
-- use schema labels consistently
-- avoid overly broad relationship patterns
-- prefer parameterized queries
-- include limits for large datasets
-
-Example:
-
-MATCH (p:Person)
-RETURN p
-LIMIT 50
-
----
-
-# Summary
-
-This skill translates natural language questions into graph queries.
-
-It enables developers to interact with graph databases using plain English while automatically generating Cypher or SPARQL syntax.
+**Last Updated:** 2026-03-08  
+**Maintainer:** OpenClaw Community  
+**License:** See LICENSE in repository root
