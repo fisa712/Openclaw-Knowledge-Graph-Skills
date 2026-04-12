@@ -1,244 +1,369 @@
 ---
-
 name: neo4j_integration
-description: Connect to a Neo4j graph database, execute Cypher queries, and perform graph operations from within the knowledge graph development workflow.
+title: Neo4j Integration
+description: Connect to Neo4j graph databases and execute Cypher queries for storing, querying, and managing knowledge graph data using the property graph model. Full support for transactions, indexes, bulk operations, and result mapping.
 category: integrations
 tags:
-
-* knowledge-graph
-* neo4j
-* graph-database
-* cypher
-* integration
-* graph-query
-  version: 1.0.0
-  author: kg-dev-skills
-
+  - knowledge-graph
+  - neo4j
+  - graph-database
+  - cypher
+  - integration
+  - graph-query
+  - database-driver
+  - property-graph
+  - transactions
+  - indexes
+  - bulk-import
+  - query-optimization
+version: 1.0.0
+author: community
+license: MIT
+metadata:
+  {"openclaw":{"emoji":"🔗","homepage":"https://clawhub.com"}}
 ---
 
 # Neo4j Integration
 
-## Purpose
+**Connect to Neo4j graph databases and execute Cypher queries for efficient knowledge graph management.**
 
-This skill enables interaction with a **Neo4j graph database** for storing, querying, and managing knowledge graph data.
+This skill enables seamless interaction with **Neo4j graph databases** using the official Python driver. It provides connection management, query execution, transaction support, and result mapping for the property graph model.
 
-It allows developers to:
+## Quick Start
 
-* connect to a Neo4j instance
-* execute Cypher queries
-* insert nodes and relationships
-* retrieve graph structures
-* update or delete graph data
+### Use When
+- Working with Neo4j-backed knowledge graphs
+- Executing Cypher queries on graph data
+- Creating or updating nodes and relationships
+- Importing graph data into Neo4j
+- Querying graph structures with complex patterns
+- Managing graph database transactions
+- Creating indexes for performance optimization
+- Building production graph applications
 
-Neo4j uses the **property graph model**, where data is represented as nodes, relationships, and properties.
+### Inputs
+- Neo4j connection credentials (URI, username, password)
+- Cypher queries with optional parameters
+- Node/relationship definitions
+- Bulk data for import
+- Transaction context
 
----
+### Outputs
+- Query results (nodes, relationships, properties)
+- Execution statistics and metrics
+- Success/failure status
+- Record counts and performance data
 
-## When To Use This Skill
+## Connection & Authentication
 
-Use this skill when:
+### Supported Protocols
 
-* working with a **Neo4j-backed knowledge graph**
-* executing **Cypher queries**
-* importing graph data into Neo4j
-* retrieving nodes or relationships
-* updating graph structures
-* debugging graph queries
+```
+bolt://        - Unencrypted connection
+neo4j://       - Standard connection (recommended)
+neo4j+s://     - TLS-encrypted connection
+neo4j+ssc://   - Self-signed certificate
+```
 
-Example triggers:
+### Connection Configuration
 
-* "Run this Cypher query"
-* "Insert these nodes into Neo4j"
-* "Create relationships in the graph"
-* "Fetch nodes connected to X"
-* "Update node properties"
-
----
-
-## Connection Configuration
-
-The skill requires connection credentials for a Neo4j instance.
-
-Example configuration:
-
-```json
-{
-  "uri": "bolt://localhost:7687",
-  "username": "neo4j",
-  "password": "password"
+```python
+config = {
+    "uri": "neo4j://localhost:7687",
+    "username": "neo4j",
+    "password": "secure_password",
+    "encrypted": True,
+    "trust": "TRUST_ALL_CERTIFICATES"
 }
 ```
 
-Supported protocols:
+### Connection Pool
 
-* `bolt`
-* `neo4j`
-* `neo4j+s`
-* `neo4j+ssc`
+- Default pool size: 50 connections
+- Configurable connection limits
+- Automatic connection recycling
+- Health checks for stale connections
 
----
+## Property Graph Model
 
-## Core Capabilities
+Neo4j uses a **property graph model** with three core elements:
 
-### Execute Cypher Queries
-
-Run Cypher queries to interact with graph data.
-
-Example query:
+### 1. Nodes
+Represent entities with labels and properties.
 
 ```cypher
-MATCH (n:Person)
-RETURN n
-LIMIT 10
+CREATE (p:Person {name: "Alice", age: 30, email: "alice@example.com"})
+CREATE (c:Company {name: "TechCorp", industry: "Technology"})
 ```
 
----
+Properties:
+- Name: String identifier
+- Properties: Key-value pairs
+- Labels: Type classification (Person, Company, etc.)
 
-### Create Nodes
-
-Example:
+### 2. Relationships
+Connect nodes with typed, directed edges and properties.
 
 ```cypher
-CREATE (p:Person {name: "Alice", age: 30})
+CREATE (a:Person)-[:WORKS_AT {since: 2020}]->(c:Company)
+CREATE (a:Person)-[:KNOWS {strength: 0.8}]->(b:Person)
 ```
 
----
+Characteristics:
+- Direction: Start node → End node
+- Type: Uppercase name (WORKS_AT, KNOWS, etc.)
+- Properties: Optional metadata
+- Can be traversed in both directions with `<-`
 
-### Create Relationships
+### 3. Properties
+Attributes on nodes and relationships.
 
-Example:
+```
+String: "text value"
+Integer: 42
+Float: 3.14
+Boolean: true/false
+DateTime: timestamp
+List: [1, 2, 3]
+```
 
+## Core Cypher Query Patterns
+
+### MATCH - Find Data
+```cypher
+MATCH (p:Person) WHERE p.age > 30 RETURN p.name, p.age
+```
+
+### CREATE - Add Data
+```cypher
+CREATE (p:Person {name: "Bob", age: 25}) RETURN p
+```
+
+### MERGE - Create or Update
+```cypher
+MERGE (p:Person {name: "Alice"}) SET p.age = 31 RETURN p
+```
+
+### MATCH + CREATE - Add Relationships
 ```cypher
 MATCH (a:Person {name: "Alice"}), (b:Person {name: "Bob"})
-CREATE (a)-[:KNOWS]->(b)
+CREATE (a)-[:KNOWS]->(b) RETURN a, b
 ```
 
----
-
-### Retrieve Graph Data
-
-Example:
-
+### DELETE - Remove Data
 ```cypher
-MATCH (a)-[r]->(b)
-RETURN a, r, b
+MATCH (p:Person {name: "Old Person"}) DELETE p
 ```
 
----
-
-### Update Node Properties
-
-Example:
-
+### RETURN + ORDER BY + LIMIT
 ```cypher
-MATCH (p:Person {name: "Alice"})
-SET p.age = 31
+MATCH (p:Person) RETURN p ORDER BY p.age DESC LIMIT 10
 ```
 
----
+## Advanced Query Features
 
-### Delete Nodes or Relationships
-
-Example:
-
+### Aggregations
 ```cypher
-MATCH (p:Person {name: "Alice"})
-DELETE p
+MATCH (p:Person) RETURN COUNT(p), AVG(p.age), MAX(p.age)
 ```
 
----
-
-## Inputs
-
-Expected inputs may include:
-
-* Cypher queries
-* node data
-* relationship definitions
-* connection credentials
-
-Example input:
-
-```json
-{
-  "query": "MATCH (n) RETURN n LIMIT 5"
-}
+### Collection Functions
+```cypher
+MATCH (p:Person)-[:KNOWS]->(friends:Person)
+RETURN p.name, COLLECT(friends.name) AS friend_list
 ```
 
----
-
-## Output
-
-Results returned from Neo4j queries.
-
-Example:
-
-```json
-{
-  "records": [
-    {"name": "Alice"},
-    {"name": "Bob"}
-  ]
-}
+### Conditional Logic
+```cypher
+MATCH (p:Person) 
+RETURN p.name, CASE WHEN p.age > 30 THEN "Senior" ELSE "Junior" END AS level
 ```
 
-Results may include:
+### Path Queries
+```cypher
+MATCH path = (a:Person)-[:KNOWS*1..3]->(b:Person)
+WHERE a.name = "Alice" AND b.name = "Bob"
+RETURN path, LENGTH(path) AS hops
+```
 
-* nodes
-* relationships
-* query statistics
+### Graph Algorithms
+```cypher
+MATCH (n:Person) WHERE exists(n.pagerank) RETURN n ORDER BY n.pagerank DESC
+```
 
----
+## Transaction Management
 
-## Procedure
+### Simple Transaction
+```cypher
+BEGIN
+CREATE (p:Person {name: "Alice"})
+CREATE (c:Company {name: "TechCorp"})
+COMMIT
+```
 
-1. Establish connection to the Neo4j database.
-2. Validate connection credentials.
-3. Accept Cypher queries or graph operations.
-4. Execute queries using the Neo4j driver.
-5. Retrieve results from the database.
-6. Format output for downstream use.
+### Rollback on Error
+```cypher
+BEGIN
+CREATE (p:Person {name: "Alice"})
+ROLLBACK
+```
 
----
+### Properties
+- Atomicity: All-or-nothing execution
+- Consistency: Graph constraints maintained
+- Isolation: ACID compliance
+- Durability: Persistent storage
 
-## Developer Notes
+## Indexes & Performance
 
-Neo4j drivers available for:
+### Create Index
+```cypher
+CREATE INDEX person_name FOR (p:Person) ON (p.name)
+CREATE INDEX company_id FOR (c:Company) ON (c.id)
+```
 
-* Python
-* JavaScript
-* Java
-* Go
+### Index Types
+- **Range Index** - Efficient for range queries
+- **Full-text Index** - Text search capability
+- **Lookup Index** - Universal index
+- **Unique Index** - Constraint enforcement
 
-Typical workflow:
+### Query Optimization
+1. **Use indexes on filtered properties** - WHERE clauses
+2. **Avoid cartesian products** - Join on common properties
+3. **Limit result sets** - Use LIMIT clause
+4. **Batch imports** - Load data in chunks
+5. **Profile queries** - EXPLAIN/PROFILE for analysis
 
-1. ingest data
-2. build graph schema
-3. run queries
-4. analyze results
+## Bulk Operations
 
-Best practices:
+### Import CSV
+```cypher
+LOAD CSV WITH HEADERS FROM "file:///data.csv" AS row
+CREATE (p:Person {name: row.name, age: toInteger(row.age)})
+```
 
-* use indexes for frequent queries
-* avoid large cartesian products
-* batch large data imports
+### Batch Create
+```cypher
+UNWIND $nodes AS node
+CREATE (n {id: node.id, name: node.name})
+```
 
----
+### Batch Update
+```cypher
+UNWIND $updates AS update
+MATCH (p:Person {id: update.id})
+SET p.age = update.age
+```
 
-## Expected Benefits
+## Result Mapping
 
-Using this skill enables:
+### Simple Results
+```cypher
+MATCH (p:Person) RETURN p.name, p.age
+```
 
-* direct interaction with Neo4j databases
-* efficient graph querying with Cypher
-* easy graph data management
-* integration with graph-based applications
+Maps to:
+```python
+[
+    {"name": "Alice", "age": 30},
+    {"name": "Bob", "age": 25}
+]
+```
 
----
+### Node Results
+```cypher
+MATCH (p:Person) RETURN p
+```
+
+Maps to Python Node objects with:
+- id: Node internal ID
+- labels: List of labels
+- properties: Dict of properties
+
+### Relationship Results
+```cypher
+MATCH (a)-[r]->(b) RETURN r
+```
+
+Maps to Relationship objects with:
+- id: Relationship internal ID
+- type: Relationship type
+- properties: Dict of properties
+- start_node_id: Source node ID
+- end_node_id: Target node ID
+
+## Error Handling
+
+### Common Errors
+
+| Error | Cause | Solution |
+|-------|-------|----------|
+| Connection refused | Neo4j not running | Start Neo4j server |
+| Authentication failed | Wrong credentials | Verify username/password |
+| Syntax error | Invalid Cypher | Check query syntax |
+| Constraint violation | Duplicate/invalid data | Check constraints |
+| Timeout | Query too slow | Add indexes, optimize query |
+| Out of memory | Too much data | Batch operations, paginate |
+
+### Retry Logic
+- Connection failures: Automatic retry with exponential backoff
+- Transient errors: Configurable retry attempts
+- Circuit breaker: Fail fast on persistent failures
+
+## Best Practices
+
+✓ **Use parameterized queries** - Prevent injection attacks  
+✓ **Create appropriate indexes** - Improve query performance  
+✓ **Batch large imports** - Avoid memory exhaustion  
+✓ **Use transactions** - Ensure data consistency  
+✓ **Profile queries** - Identify performance bottlenecks  
+✓ **Close connections** - Prevent resource leaks  
+✓ **Limit result sets** - Avoid network overhead  
+✓ **Normalize node names** - Prevent duplicate nodes  
+✓ **Document schemas** - Maintain data governance  
+✓ **Monitor database** - Track performance metrics  
+
+## Integration Points
+
+This skill integrates with:
+
+- **GraphQL Graph Mapping** - Expose Neo4j via GraphQL
+- **Graph Query Optimization** - Optimize Cypher queries
+- **Schema Validation** - Validate graph structure
+- **CSV Graph Loader** - Import CSV to Neo4j
+- **Constraint Generator** - Define database constraints
+- **REST API Wrapper** - Expose Neo4j as REST API
+
+## Recommended Libraries
+
+### Neo4j Python Driver
+- `neo4j` - Official driver (4.x/5.x)
+- `neomodel` - Python ORM for Neo4j
+- `py2neo` - Pythonic interface
+
+### Query Building
+- `cypher-dsl-python` - Build Cypher programmatically
+- `ipython-cypher` - Jupyter integration
+
+### Data Processing
+- `pandas` - Data frame operations
+- `polars` - Efficient data loading
+- `networkx` - Graph analysis
+
+### Visualization
+- `graphistry` - Interactive graph visualization
+- `pyvis` - Network visualization
+- `neovis.js` - Neo4j visualization
 
 ## Related Skills
 
-* RDF Triple Store Integration
-* TigerGraph Connector
-* JanusGraph Connector
-* GraphQL Graph Mapping
+- **RDF Triple Store Integration** - Alternative graph database
+- **TigerGraph Connector** - Distributed graph platform
+- **JanusGraph Connector** - Scalable graph database
+- **GraphQL Graph Mapping** - API layer on Neo4j
+- **Graph Query Optimization** - Improve query performance
+
+---
+
+**Status:** Production Ready | **Version:** 1.0.0

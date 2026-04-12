@@ -1,233 +1,249 @@
 ---
-name: api-ingestion-connectors
+name: api_ingestion_connectors
+title: API Ingestion Connectors
 description: Connect to external APIs and ingest data into graph-ready structures for ETL pipelines and knowledge graph construction.
+category: data-ingestion
+tags:
+  - api-integration
+  - rest-api
+  - graphql
+  - data-ingestion
+  - etl
+  - knowledge-graph
+  - authentication
+  - pagination
+  - data-transformation
+  - developer-tools
+version: 1.0.0
+author: community
+license: MIT
 metadata:
   {"openclaw":{"emoji":"🌐","homepage":"https://clawhub.com"}}
 ---
 
 # API Ingestion Connectors
 
-Connect external APIs to graph ingestion pipelines.
+**Ingest data from external APIs into graph-ready formats for knowledge graph construction.**
 
-This skill retrieves data from APIs and prepares it for transformation into **graph-ready formats** such as nodes, relationships, and triples.
+This skill retrieves data from diverse API sources and prepares it for transformation into **graph-ready structures** such as nodes, relationships, and triples.
 
-It enables automated ingestion of structured or semi-structured data from:
+## Quick Start
 
-- REST APIs
-- GraphQL APIs
-- web services
-- SaaS platforms
-- public data APIs
+### Use When
+- Ingesting data from REST APIs
+- Querying GraphQL endpoints
+- Integrating external services into data pipelines
+- Pulling data from SaaS platforms
+- Transforming API responses into graph datasets
+- Building real-time knowledge graph updates
 
-The retrieved data can then be processed by downstream transformation skills such as:
+### Inputs
+- API endpoint URLs
+- Authentication credentials
+- Request parameters and headers
+- Pagination configuration
+- Response format specifications
+- Transformation mappings
 
-- JSON → Triples Converter
-- CSV → Graph Loader Generator
-- Text → Entity / Relation Extractor
+### Outputs
+- JSON/CSV datasets
+- Graph-ready node/edge structures
+- RDF triples
+- Connector configurations
+- ETL pipeline definitions
 
----
+## Example
 
-# When To Use This Skill
-
-Use this skill when a user wants to:
-
-- ingest data from an **API**
-- integrate **external services into a data pipeline**
-- pull data periodically from web services
-- transform API responses into **graph datasets**
-- connect APIs to **knowledge graph ingestion workflows**
-
-Example requests:
-
-- “Ingest data from this REST API.”
-- “Build a pipeline that pulls data from an API and converts it into triples.”
-- “Fetch data from this endpoint and load it into a graph database.”
-- “Create an ingestion connector for a public API.”
-
----
-
-# What This Skill Produces
-
-The skill generates **API ingestion configurations** and **data connectors** that can be used inside ETL pipelines.
-
-The configuration typically includes:
-
-1. **API Endpoint**
-2. **Authentication Method**
-3. **Request Parameters**
-4. **Response Format**
-5. **Transformation Strategy**
-
----
-
-# Example API Configuration
-
-Example REST API connector:
-connector:
-```text
-type: rest_api
-endpoint: https://api.example.com/products
-method: GET
-response_format: json
+**Input API Configuration:**
+```
+Endpoint: https://api.example.com/users
+Method: GET
+Auth: Bearer Token
+Pagination: page-based, 30 items per page
 ```
 
----
-
-# Example GraphQL Connector
-connector:
-
-type: graphql
-
-endpoint: https://api.example.com/graphql
-
-query:
+**Generated Output:**
 ```json
 {
-    products {
-        id
-        name
-        manufacturer
+  "nodes": [
+    {"id": "user_1", "type": "Person", "name": "Alice", "email": "alice@example.com"},
+    {"id": "org_1", "type": "Organization", "name": "Acme Corp"}
+  ],
+  "edges": [
+    {"source": "user_1", "target": "org_1", "relation": "WORKS_AT"}
+  ]
+}
+```
+
+## Supported API Types
+
+### 1. REST APIs
+Connect to standard HTTP REST endpoints with flexible authentication and pagination
+
+```text
+type: rest
+endpoint: https://api.example.com/resource
+method: GET|POST|PUT|DELETE
+response_format: json|xml|csv
+```
+
+### 2. GraphQL APIs
+Query GraphQL endpoints with structured query definitions
+
+```graphql
+query {
+  users {
+    id
+    name
+    email
+    organization {
+      name
     }
+  }
 }
 ```
 
----
+### 3. OAuth-Protected APIs
+Authenticate using OAuth 2.0 flows (authorization code, client credentials)
 
-# Example Pipeline Integration
+```text
+auth_type: oauth2
+client_id: ${CLIENT_ID}
+client_secret: ${CLIENT_SECRET}
+token_endpoint: https://api.example.com/oauth/token
+```
 
-Example ingestion pipeline using an API source:
+### 4. API Key Authentication
+Simple API key-based authentication
 
-pipeline:
+```text
+auth_type: api_key
+key_param: X-API-Key
+key_value: ${API_KEY}
+```
 
-extract:
+### 5. Bearer Token Authentication
+OAuth 2.0 bearer token authentication
 
-type: api
+```text
+auth_type: bearer
+token: ${ACCESS_TOKEN}
+```
 
-endpoint: https://api.example.com/users
+## Pagination Strategies
 
-transform:
-- convert_json_to_triples
-- normalize_entities
+### Offset/Limit Pagination
+```text
+type: offset
+param_offset: offset
+param_limit: limit
+start_at: 0
+page_size: 20
+```
 
-load:
+### Page-Based Pagination
+```text
+type: page
+param_page: page
+page_size: 30
+start_at: 1
+```
 
-target: graph_database
+### Cursor-Based Pagination
+```text
+type: cursor
+cursor_param: after
+next_cursor_field: pageInfo.endCursor
+has_next_field: pageInfo.hasNextPage
+```
 
----
+## Execution Steps
 
-# Example Data Flow
+1. **Validate Configuration** – Check endpoint, auth, and parameters
+2. **Authenticate** – Obtain credentials and tokens
+3. **Make Request** – Execute HTTP/GraphQL request
+4. **Handle Pagination** – Fetch all pages/results
+5. **Parse Response** – Extract and validate response data
+6. **Transform Data** – Convert to graph-ready format
+7. **Generate Output** – Create nodes, edges, or triples
+8. **Feed to Pipeline** – Pass to downstream transformation skills
 
-Step 1 — Fetch data
+## Output Formats
 
-GET https://api.example.com/users
-
-Step 2 — API response
-
+### Node-Edge Structure
 ```json
 {
-    "users": [
-        {"id":1,"name":"Alice","company":"Acme"}
-    ]
+  "nodes": [{"id": "...", "type": "...", "properties": {...}}],
+  "edges": [{"source": "...", "target": "...", "type": "...", "properties": {...}}]
 }
 ```
 
-Step 3 — Transformation
-
-Entities:
-```text
-Alice → Person
-Acme → Organization
+### Graph Triples (RDF)
+```turtle
+:entity1 :relationType :entity2 .
+:entity1 :property "value" .
 ```
 
-Relationships:
-```text
-Alice WORKS_AT Acme
+### CSV Export
+```csv
+node_id,node_type,node_name,property1,property2
 ```
 
-Step 4 — Graph Output
+## Error Handling
+
+The connector should handle:
+
+- **Network Errors** – Retry logic with exponential backoff
+- **Authentication Errors** – Token refresh, credential validation
+- **Rate Limiting** – Backoff and request throttling
+- **Malformed Responses** – Schema validation and error reporting
+- **Timeouts** – Connection and read timeout handling
+
+Example retry strategy:
 ```text
-:Alice :worksAt :Acme .
+retry:
+  max_attempts: 3
+  backoff_factor: 2
+  initial_delay: 1s
+  max_delay: 60s
+  retryable_status_codes: [429, 500, 502, 503, 504]
 ```
 
----
+## Recommended Libraries
 
-# Supported Authentication Methods
+- **HTTP Clients:** requests, httpx, aiohttp
+- **GraphQL:** gql, graphene, strawberry
+- **OAuth:** authlib, oauthlib
+- **Data Validation:** pydantic, jsonschema
+- **Data Transformation:** pandas, polars
 
-API connectors may support:
+## Best Practices
 
-- API keys
-- bearer tokens
-- OAuth
-- basic authentication
+✓ Respect API rate limits and terms of service  
+✓ Implement exponential backoff for retries  
+✓ Validate response schemas before processing  
+✓ Handle and log errors appropriately  
+✓ Cache results when possible  
+✓ Normalize and deduplicate entities  
+✓ Secure credentials (use environment variables)  
+✓ Monitor API changes and versioning  
+✓ Implement request timeout handling  
+✓ Document API assumptions and requirements  
 
-Example:
-```text
-auth:
-type: bearer
-token: ${API_TOKEN}
-```
+## Integration with Downstream Skills
 
----
+The ingested data feeds into:
 
-# Pagination Handling
+- **JSON → Triples Converter** – Transform to RDF
+- **CSV → Graph Loader** – Load into graph database
+- **Text → Entity/Relation Extractor** – Extract structured knowledge
+- **ETL Pipeline Generator** – Orchestrate full workflows
+- **Schema Validation** – Validate against graph schema
 
-Many APIs return paginated responses. The connector may support automatic pagination.
+## References
 
-Example:
-
-```text
-pagination:
-type: page
-parameter: page
-start: 1
-```
-
----
-
-# Output Formats
-
-The ingested data can be passed to downstream skills as:
-
-- JSON datasets
-- CSV files
-- graph triples
-- node/edge structures
+See [connector-patterns.md](references/connector-patterns.md) for detailed API connector patterns and [example-connectors.md](examples/example-connectors.md) for complete connector examples.
 
 ---
 
-# Implementation Notes
-
-The connector may internally:
-
-- perform HTTP requests
-- handle authentication
-- process pagination
-- parse API responses
-- convert results into structured datasets
-
-These outputs can then feed ETL pipelines and knowledge graph ingestion processes.
-
----
-
-# Best Practices
-
-When ingesting data from APIs:
-
-- respect API rate limits
-- implement retry logic
-- validate response schemas
-- normalize repeated entities
-- cache results when possible
-
----
-
-# Summary
-
-This skill creates connectors that ingest data from **external APIs** and feed it into **graph ingestion pipelines**.
-
-It enables:
-
-- automated API data ingestion
-- integration of external services
-- real-time knowledge graph updates
-- scalable data pipeline architectures
+**Status:** Production Ready | **Version:** 1.0.0

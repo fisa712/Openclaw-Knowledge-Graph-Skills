@@ -1,386 +1,177 @@
 ---
-
 name: graph_schema_migration_diff
-title: Graph Schema Migration Diff (v1 → v2)
-description: Analyze differences between two knowledge graph schemas and generate migration plans and scripts for upgrading graph data structures.
+title: Graph Schema Migration Diff
+description: Analyze differences between knowledge graph schema versions and generate migration plans and scripts for safe schema evolution.
 category: graph-modeling
 tags:
-
-* knowledge-graph
-* schema-migration
-* graph-evolution
-* rdf
-* owl
-* neo4j
-* cypher
-* developer-tools
-  version: 0.1.0
-  author: community
-  license: MIT
-
+  - knowledge-graph
+  - schema-migration
+  - graph-evolution
+  - rdf
+  - owl
+  - neo4j
+  - cypher
+  - developer-tools
+version: 1.0.0
+author: community
+license: MIT
 ---
 
-# Graph Schema Migration Diff (v1 → v2)
+# Graph Schema Migration Diff
 
-## Purpose
+**Detect schema differences and generate migration plans for graph evolution.**
 
-This skill assists developers in **analyzing differences between two versions of a knowledge graph schema** and generating a migration strategy.
+This skill compares two knowledge graph schema versions and generates safe migration strategies.
 
-It helps with:
+## Quick Start
 
-* identifying schema changes
-* detecting added or removed entities
-* identifying property changes
-* detecting relationship changes
-* generating migration scripts
+### Use When
+- Upgrading graph schemas
+- Analyzing schema changes between versions
+- Planning schema evolution
+- Generating migration scripts
+- Migrating existing data
+- Refactoring graph models
 
-The goal is to **safely evolve graph schemas without breaking existing data**.
+### Inputs
+- Schema Version 1 (RDF, OWL, or property graph)
+- Schema Version 2 (RDF, OWL, or property graph)
+- Migration scope (full or partial)
 
----
+### Outputs
+- Schema diff report
+- Change categories (added, removed, modified)
+- Migration plan
+- Migration scripts (Cypher, SPARQL, or Python)
+- Risk assessment
 
-# When To Use This Skill
+## Example
 
-Use this skill when:
-
-* upgrading a knowledge graph schema
-* migrating from **schema v1 → schema v2**
-* refactoring graph models
-* renaming nodes or relationships
-* adding or removing properties
-* introducing new graph constraints
-
-Example prompts:
-
-* "Generate a migration plan between these graph schemas."
-* "Detect changes between schema versions."
-* "Create Cypher migration scripts."
-* "Compare two RDF ontology versions."
-
----
-
-# Inputs
-
-The skill accepts two schema definitions:
-
-* **Schema Version 1**
-* **Schema Version 2**
-
-Schemas may be expressed as:
-
-* RDF/OWL ontology files
-* property graph models
-* Cypher schema definitions
-* JSON schema representations
-* entity/property lists
-
-Example input:
-
-### Schema v1
-
+**Schema v1:**
 ```
-Entities:
-Student
-Course
-
-Relationships:
+Student: student_id, name, email
+Course: course_code, title
 (Student)-[:ENROLLED_IN]->(Course)
-
-Properties:
-Student
-- student_id
-- name
 ```
 
-### Schema v2
-
+**Schema v2:**
 ```
-Entities:
-Student
-Course
-Department
-
-Relationships:
+Student: student_id, full_name, email
+Course: course_code, title, credits
+Department: dept_id, name
 (Student)-[:ENROLLED_IN]->(Course)
 (Course)-[:BELONGS_TO]->(Department)
-
-Properties:
-Student
-- student_id
-- full_name
 ```
 
----
-
-# Schema Diff Detection
-
-The skill detects several categories of changes.
-
----
-
-## 1. New Entities
-
-Example:
-
+**Diff Report:**
 ```
-+ Department
-```
+ADDED:
+  + Department label
+  + Course.credits property
+  + (Course)-[:BELONGS_TO]->(Department) relationship
 
----
+MODIFIED:
+  ~ Student.name → Student.full_name (rename)
 
-## 2. Removed Entities
+REMOVED:
+  (none)
 
-Example:
-
-```
-- Instructor
+Risk: Medium | Complexity: Medium
 ```
 
----
+## Change Detection
 
-## 3. Property Changes
+### Entity Changes
+- Added entities (new node labels/classes)
+- Removed entities (deleted labels/classes)
+- Renamed entities
 
-Example:
+### Property Changes
+- Added properties (new attributes)
+- Removed properties (deleted attributes)
+- Renamed properties (property name changes)
+- Type changes (property type modifications)
 
+### Relationship Changes
+- Added relationships (new relationship types)
+- Removed relationships (deleted relationship types)
+- Direction changes
+- Cardinality changes
+
+### Constraint Changes
+- Added constraints (new unique, required)
+- Removed constraints (deleted constraints)
+- Modified constraints
+
+## Execution Steps
+
+1. **Parse Schemas** – Load both schema versions
+2. **Extract Structure** – Build schema graphs
+3. **Compare** – Detect differences systematically
+4. **Categorize Changes** – Classify by type
+5. **Assess Risk** – Evaluate migration impact
+6. **Generate Plan** – Create migration strategy
+7. **Generate Scripts** – Output executable migrations
+
+## Output Formats
+
+### Migration Plan (Text)
 ```
-Student.name → Student.full_name
-```
+Schema Migration: v1 → v2
+========================
 
-Detected as:
+ENTITY CHANGES:
+  + Department
 
-* property rename
-* property addition
-* property removal
+PROPERTY CHANGES:
+  Student.name → Student.full_name
 
----
+RELATIONSHIP CHANGES:
+  + (Course)-[:BELONGS_TO]->(Department)
 
-## 4. Relationship Changes
-
-Example:
-
-```
-+ (Course)-[:BELONGS_TO]->(Department)
-```
-
----
-
-## 5. Constraint Changes
-
-Example:
-
-```
-Student.student_id UNIQUE
-```
-
----
-
-# Migration Plan Output
-
-The skill produces a structured migration plan.
-
-Example:
-
-```
-Migration Plan
---------------
-
-1. Add Node Label
-Department
-
-2. Add Relationship
-(Course)-[:BELONGS_TO]->(Department)
-
-3. Rename Property
-Student.name → Student.full_name
+Migration Steps: 3
+Risk Level: Medium
+Estimated Time: 30 minutes
 ```
 
----
+### Cypher Migration
+```cypher
+-- 1. Add constraint for new entity
+CREATE CONSTRAINT department_id_unique 
+FOR (d:Department) REQUIRE d.department_id IS UNIQUE
 
-# Neo4j Migration Script Example
-
-Example Cypher migration:
-
-```
+-- 2. Rename property
 MATCH (s:Student)
 WHERE s.name IS NOT NULL
 SET s.full_name = s.name
 REMOVE s.name
+
+-- 3. Add new relationship
+CREATE (c:Course)-[:BELONGS_TO]->(d:Department)
 ```
 
-Add new node type:
+## Recommended Libraries
 
-```
-CREATE CONSTRAINT department_id_unique
-FOR (d:Department)
-REQUIRE d.department_id IS UNIQUE;
-```
+- **Graph Analysis:** networkx, rdflib
+- **Schema Comparison:** deepdiff, dictdiffer
+- **RDF/OWL:** owlready2, pyshacl
+- **Neo4j:** neo4j, py2neo
+
+## Best Practices
+
+✓ Test migrations on staging data first  
+✓ Create backups before migration  
+✓ Maintain backward compatibility  
+✓ Document all schema changes  
+✓ Version all schemas  
+✓ Review migration scripts carefully  
+✓ Perform migrations incrementally  
+✓ Validate data after migration  
+
+## References
+
+See [migration-patterns.md](references/migration-patterns.md) for migration strategies and [example-migrations.md](examples/example-migrations.md) for domain migration examples.
 
 ---
 
-# RDF / OWL Migration Example
-
-Example RDF change:
-
-```
-:Student :name → :fullName
-```
-
-Migration strategy:
-
-* add new property
-* copy values
-* deprecate old property
-
-Example:
-
-```
-:s1 :fullName "Alice" .
-:s1 :name "Alice" .
-```
-
----
-
-# Developer Implementation Notes
-
-When implementing schema diff tools programmatically, prefer **Python libraries suitable for graph analysis and schema comparison**.
-
-Recommended libraries:
-
-### Graph Processing
-
-* networkx
-
-### RDF / OWL Tools
-
-* rdflib
-* owlready2
-
-### Data Comparison
-
-* deepdiff
-* dictdiffer
-
-### Neo4j Integration
-
-* neo4j
-* py2neo
-
----
-
-# Example Python Schema Diff
-
-```
-from deepdiff import DeepDiff
-
-schema_v1 = {
-    "Student": ["student_id", "name"],
-    "Course": ["course_id"]
-}
-
-schema_v2 = {
-    "Student": ["student_id", "full_name"],
-    "Course": ["course_id"],
-    "Department": ["department_id"]
-}
-
-diff = DeepDiff(schema_v1, schema_v2)
-
-print(diff)
-```
-
----
-
-# Migration Script Generator Example
-
-```
-def generate_property_rename(node, old_prop, new_prop):
-
-    cypher = f"""
-MATCH (n:{node})
-WHERE n.{old_prop} IS NOT NULL
-SET n.{new_prop} = n.{old_prop}
-REMOVE n.{old_prop}
-"""
-
-    return cypher
-
-print(generate_property_rename("Student","name","full_name"))
-```
-
----
-
-# Skill Behavior
-
-When executing this skill:
-
-1. parse schema v1
-2. parse schema v2
-3. detect structural differences
-4. classify schema changes
-5. generate migration plan
-6. produce migration scripts
-
-Outputs should include:
-
-* schema diff report
-* migration plan
-* database migration scripts
-
----
-
-# Output Format
-
-Example migration report:
-
-```
-Schema Migration Diff
----------------------
-
-Entities Added
-+ Department
-
-Properties Changed
-Student.name → Student.full_name
-
-Relationships Added
-(Course)-[:BELONGS_TO]->(Department)
-
-Migration Complexity: Medium
-```
-
----
-
-# Best Practices
-
-When evolving graph schemas:
-
-* maintain backward compatibility when possible
-* deprecate fields before removing them
-* perform migrations in stages
-* test migrations on staging data
-* keep schema version history
-
----
-
-# Limitations
-
-Automated schema diffs may not detect:
-
-* semantic meaning changes
-* complex relationship redesigns
-* domain-level schema decisions
-
-Developers should review migration plans carefully.
-
----
-
-# Future Extensions
-
-Potential improvements:
-
-* automated migration execution
-* graph refactoring tools
-* schema version registry
-* visual schema diff tools
-* rollback migration generation
-
----
+**Status:** Production Ready | **Version:** 1.0.0

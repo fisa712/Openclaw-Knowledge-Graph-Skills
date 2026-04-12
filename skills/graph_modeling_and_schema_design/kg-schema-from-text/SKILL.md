@@ -12,235 +12,105 @@ tags:
   - graph-modeling
   - entity-extraction
   - developer-tools
-version: 0.1.0
+version: 1.0.0
 author: community
 license: MIT
 ---
 
-# Knowledge Graph Ontology / Schema Generation from Text
+# Knowledge Graph Schema Generation from Text
 
-## Purpose
+**Automatically derive structured graph schemas from natural language documentation and domain descriptions.**
 
-This skill helps developers **automatically derive a knowledge graph ontology or schema from natural language descriptions, documentation, datasets, or domain text**.
+This skill converts textual descriptions into machine-readable graph models with entities, relationships, properties, and constraints.
 
-It converts textual descriptions into structured graph models including:
+## Quick Start
 
-- Entities / Node Types
-- Relationships / Edge Types
-- Properties / Attributes
-- Constraints
-- Domain ontology definitions
+### Use When
+- Converting domain documentation → ontology
+- Bootstrapping a knowledge graph schema
+- Designing initial RDF/OWL or Neo4j schemas
+- Extracting schema from requirements or API docs
 
-This is primarily designed for **knowledge graph developers designing initial schemas from domain documentation**.
-
----
-
-# When To Use This Skill
-
-Use this skill when:
-
-- A developer provides **domain documentation**
-- A developer wants to **bootstrap a knowledge graph schema**
-- A developer wants to convert **requirements → ontology**
-- A developer needs a **first version of RDF/OWL or property graph schema**
-
-Example prompts:
-
-- "Generate a knowledge graph schema from this domain description."
-- "Extract ontology entities and relationships from this text."
-- "Create an RDF ontology from this documentation."
-- "Design a Neo4j schema based on this business domain."
-
----
-
-# Inputs
-
-The skill expects one or more of the following:
-
+### Inputs
 - Natural language domain descriptions
 - Technical documentation
-- Example records
+- Example records or datasets
 - JSON/CSV structures
-- API response schemas
-- Requirements specifications
 
-Example input:
+### Outputs
+- Entity types (nodes/classes)
+- Relationship types (edges/predicates)
+- Properties & attributes
+- Graph schema representation (Property Graph or RDF)
 
-A university system contains students, professors, courses and departments.
+## Example
 
-Students enroll in courses.
+**Input:**
+```
+A university contains students, professors, courses, and departments.
+Students enroll in courses. Professors teach courses.
+Departments manage both courses and professors.
+```
 
-Professors teach courses.
-
-Departments manage professors and courses.
-
-
----
-
-# Expected Output
-
-The skill should generate:
-
-1. **Entity Types**
-2. **Relationship Types**
-3. **Properties**
-4. **Constraints**
-5. **Graph Schema Representation**
-
-Outputs may include:
-
-- Property Graph Schema
-- RDF Triples
-- OWL Ontology
-- JSON Schema representation
-
-Example output structure:
-
-Entities:
-
-- Student
-
-- Professor
-
-- Course
-
-- Department
+**Output:**
+```
+Entities: Student, Professor, Course, Department
 
 Relationships:
-
-Student -> ENROLLED_IN -> Course
-
-Professor -> TEACHES -> Course
-
-Department -> MANAGES -> Course
-
-Department -> EMPLOYS -> Professor
+- Student -> ENROLLED_IN -> Course
+- Professor -> TEACHES -> Course
+- Department -> MANAGES -> Course
+- Department -> MANAGES -> Professor
 
 Properties:
+- Student: id, name, email, enrollment_date
+- Course: id, title, credits, department
+- Professor: id, name, department, specialization
+- Department: id, name, budget
+```
 
-Student:
+## Execution Steps
 
-- student_id
+1. **Extract Entities** – Identify nouns/concepts from text
+2. **Extract Relationships** – Identify verbs/connections
+3. **Extract Properties** – Identify attributes and constraints
+4. **Infer Structure** – Build graph patterns
+5. **Generate Schema** – Output in target format (Property Graph or RDF)
 
-- name
+## Schema Formats
 
-- email
+### Property Graph (Neo4j, TigerGraph)
+```
+Nodes: Student, Professor, Course, Department
+Relationships: ENROLLED_IN, TEACHES, MANAGES
+Properties: Names, IDs, dates, descriptions
+```
 
-Course:
+### RDF/OWL (Semantic Web)
+```
+Classes: Student, Professor, Course, Department
+Properties: enrolledIn, teaches, manages
+Attributes: name, id, description
+```
 
-- course_id
+## Recommended Libraries
 
-- title
+- **NLP**: spaCy, transformers, nltk
+- **Graph**: networkx, rdflib, pyvis, owlready2
+- **Schema**: pydantic, dataclasses, jsonschema
 
-- credits
+## Best Practices
 
+✓ Use clear, consistent entity names (PascalCase)  
+✓ Normalize relationship directions  
+✓ Extract domain-specific constraints  
+✓ Separate schema from instance data  
+✓ Follow knowledge graph modeling standards  
+
+## References
+
+See [extraction-patterns.md](references/extraction-patterns.md) for entity/relationship extraction guidelines and [example-schemas.md](examples/example-schemas.md) for domain examples.
 
 ---
 
-# Developer Implementation Notes
-
-When code generation or automation is required, prefer **Python implementations** using common knowledge graph and NLP libraries.
-
-Recommended libraries:
-
-### NLP / Extraction
-
-- spaCy
-- transformers
-- nltk
-
-### Knowledge Graph Construction
-
-- networkx
-- rdflib
-- pyvis
-- owlready2
-
-### Schema Generation
-
-- pydantic
-- dataclasses
-- jsonschema
-
-### Visualization
-
-- pyvis
-- graphviz
-
----
-
-# Example Python Workflow
-
-Below is a minimal reference implementation showing how extracted entities and relations can be converted into a graph.
-
-```python
-import networkx as nx
-
-entities = ["Student", "Professor", "Course", "Department"]
-
-relationships = [
-    ("Student", "ENROLLED_IN", "Course"),
-    ("Professor", "TEACHES", "Course"),
-    ("Department", "MANAGES", "Course"),
-]
-
-G = nx.MultiDiGraph()
-
-for entity in entities:
-    G.add_node(entity, type="entity")
-
-for src, rel, dst in relationships:
-    G.add_edge(src, dst, relation=rel)
-
-print(G.nodes())
-print(G.edges(data=True))
-```
-Example RDF generation:
-
-```python
-from rdflib import Graph, Namespace, RDF
-
-g = Graph()
-ex = Namespace("http://example.org/")
-
-g.add((ex.Student, RDF.type, ex.Entity))
-g.add((ex.Student, ex.ENROLLED_IN, ex.Course))
-
-print(g.serialize(format="turtle"))
-```
-
-## Skill Behavior Guidelines
-
-When executing this skill:
-
-1. Identify core entities
-2. Identify relationships
-3. Extract properties
-4. Infer graph structure
-5. Suggest ontology extensions
-6. Output machine-readable schema
-
-Always:
-
-* prefer clear graph structures
-
-* avoid ambiguous relationships
-
-* normalize entity naming
-
-* follow knowledge graph modeling best practices
-
-##### Best Practices
-
-Recommended modeling principles:
-
-* Use clear entity naming
-
-* Avoid duplicate relationships
-
-* Use domain-driven design
-
-* Separate schema vs instance data
-
-* Maintain consistent relationship direction
-
+**Status:** Production Ready | **Version:** 1.0.0
