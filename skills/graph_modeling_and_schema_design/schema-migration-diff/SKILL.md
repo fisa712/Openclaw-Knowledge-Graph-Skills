@@ -174,4 +174,4 @@ See [migration-patterns.md](references/migration-patterns.md) for migration stra
 
 ---
 
-**Status:** Production Ready | **Version:** 1.0.0
+**Version:** 1.0.0

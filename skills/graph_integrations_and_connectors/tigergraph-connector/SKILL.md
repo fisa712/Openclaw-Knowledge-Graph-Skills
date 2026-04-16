@@ -553,6 +553,5 @@ connector.batch_insert(vertices, edges)
 
 ---
 
-**Status:** ✅ Production Ready  
 **Version:** 1.0.0  
 **Last Updated:** April 12, 2026

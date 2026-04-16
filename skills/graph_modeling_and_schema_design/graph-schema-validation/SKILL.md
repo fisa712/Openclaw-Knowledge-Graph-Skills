@@ -150,4 +150,4 @@ See [validation-patterns.md](references/validation-patterns.md) for validation s
 
 ---
 
-**Status:** Production Ready | **Version:** 1.0.0
+**Version:** 1.0.0

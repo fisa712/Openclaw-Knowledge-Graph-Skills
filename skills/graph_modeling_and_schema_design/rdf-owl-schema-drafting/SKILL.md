@@ -142,4 +142,4 @@ See [ontology-patterns.md](references/ontology-patterns.md) for OWL design patte
 
 ---
 
-**Status:** Production Ready | **Version:** 1.0.0
+**Version:** 1.0.0

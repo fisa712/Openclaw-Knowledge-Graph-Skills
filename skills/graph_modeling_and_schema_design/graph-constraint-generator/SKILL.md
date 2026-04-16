@@ -175,4 +175,4 @@ See [constraint-patterns.md](references/constraint-patterns.md) for constraint d
 
 ---
 
-**Status:** Production Ready | **Version:** 1.0.0
+**Version:** 1.0.0

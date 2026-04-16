@@ -692,6 +692,5 @@ graphs = connector.list_graphs()
 
 ---
 
-**Status:** ✅ Production Ready  
 **Version:** 1.0.0  
 **Last Updated:** April 12, 2026

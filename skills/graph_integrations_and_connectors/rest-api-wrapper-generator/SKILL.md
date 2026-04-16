@@ -714,7 +714,6 @@ generator.start_server(
 - [RESTful API Design](https://swagger.io/resources/articles/best-practices-in-api-design/)
 
 ---
-
-**Status:** ✅ Production Ready  
+ 
 **Version:** 1.0.0  
 **Last Updated:** April 12, 2026
