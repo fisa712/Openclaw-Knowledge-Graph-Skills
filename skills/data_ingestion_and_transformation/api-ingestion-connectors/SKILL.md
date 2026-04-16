@@ -246,4 +246,4 @@ See [connector-patterns.md](references/connector-patterns.md) for detailed API c
 
 ---
 
-**Status:** Production Ready | **Version:** 1.0.0
+**Version:** 1.0.0

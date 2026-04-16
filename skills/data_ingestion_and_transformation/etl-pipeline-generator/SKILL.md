@@ -415,4 +415,4 @@ See [pipeline-patterns.md](references/pipeline-patterns.md) for detailed ETL pip
 
 ---
 
-**Status:** Production Ready | **Version:** 1.0.0
+**Version:** 1.0.0

@@ -141,4 +141,4 @@ See [schema-patterns.md](references/schema-patterns.md) for property graph desig
 
 ---
 
-**Status:** Production Ready | **Version:** 1.0.0
+**Version:** 1.0.0

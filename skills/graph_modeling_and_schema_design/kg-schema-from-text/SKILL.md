@@ -113,4 +113,4 @@ See [extraction-patterns.md](references/extraction-patterns.md) for entity/relat
 
 ---
 
-**Status:** Production Ready | **Version:** 1.0.0
+**Version:** 1.0.0

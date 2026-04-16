@@ -302,4 +302,4 @@ See [loader-patterns.md](references/loader-patterns.md) for detailed CSV loader 
 
 ---
 
-**Status:** Production Ready | **Version:** 1.0.0
+**Version:** 1.0.0

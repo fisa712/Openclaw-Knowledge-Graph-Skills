@@ -405,4 +405,4 @@ See [mapping-patterns.md](references/mapping-patterns.md) for detailed mapping d
 
 ---
 
-**Status:** Production Ready | **Version:** 1.0.0
+**Version:** 1.0.0
